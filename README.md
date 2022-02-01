@@ -4,6 +4,8 @@ Elección de materias para horarios de secundaria.
 
 sub|draw = **subject** | **draw**
 
+> Esta herramienta permite generar combinaciones de asignaturas que sumen un determinado número de horas semanales. Útil para proyectar el horario personal en el reparto de materias sobre departamentos didácticos de secundaria y formación profesional.
+
 ## Instalación
 
 Cree un entorno virtual Python e instale los requerimientos:
@@ -33,7 +35,7 @@ Por ejemplo:
 
 > 💡 &nbsp;No se espera ninguna cabecera.
 
-Por defecto, el nombre del fichero de datos será `subjects.csv`, aunque puede ser cualquier otro.
+Por defecto, se espera que el nombre del fichero de datos sea `subjects.csv` (alojado en el directorio de trabajo del proyecto) aunque puede modificarse mediante argumentos de línea de comandos.
 
 ## Modo de uso
 
@@ -42,7 +44,7 @@ $ python main.py --help
 Usage: main.py [OPTIONS]
 
 Options:
-  -i, --filename TEXT     Subjects filename (csv format)  [default:
+  -f, --filename TEXT     Subjects filename (csv format)  [default:
                           subjects.csv]
   -h, --hours INTEGER     Number of hours to reach within each schedule
                           [default: 18]
