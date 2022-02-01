@@ -26,9 +26,15 @@ def run(
         '-s',
         help='Maximum size for subject combinations',
     ),
+    include: list[str] = typer.Option(
+        None, '--include', '-i', help='Include this subject, group or subject-group'
+    ),
+    exclude: list[str] = typer.Option(
+        None, '--exclude', '-x', help='Exclude this subject, group or subject-group'
+    ),
 ):
     subjects = core.get_subjects(filename)
-    for combination in core.get_combinations(subjects, hours, max_size):
+    for combination in core.get_combinations(subjects, hours, max_size, include, exclude):
         core.show_combination(combination)
 
 
