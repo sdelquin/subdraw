@@ -18,4 +18,10 @@ def get_combinations(subjects, hours, max_size):
         for combination in itertools.combinations(subjects, size + 1):
             combination_hours = sum(subjects[s] for s in combination)
             if combination_hours == hours:
-                print(f'{combination} -> {hours}')
+                yield combination, hours
+
+
+def show_combination(combination: tuple[tuple[str], int]):
+    subjects = ', '.join(combination[0])
+    hours = combination[1]
+    print(f'{subjects} -> {hours}')

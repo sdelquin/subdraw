@@ -28,7 +28,8 @@ def run(
     ),
 ):
     subjects = core.get_subjects(filename)
-    core.get_combinations(subjects, hours, max_size)
+    for combination in core.get_combinations(subjects, hours, max_size):
+        core.show_combination(combination)
 
 
 if __name__ == '__main__':
