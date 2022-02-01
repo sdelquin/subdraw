@@ -11,7 +11,7 @@ def run(
     filename: str = typer.Option(
         settings.SUBJECTS_FILENAME,
         '--filename',
-        '-i',
+        '-f',
         help='Subjects filename (csv format)',
     ),
     hours: int = typer.Option(
