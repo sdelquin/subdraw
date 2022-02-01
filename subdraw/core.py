@@ -1,50 +1,72 @@
 import itertools
+import operator
 
 
-def get_subjects(filename):
-    subjects = {}
-    with open(filename) as f:
-        for line in f:
-            fields = line.strip().split(',')
-            subject_group = f'{fields[0]}-{fields[-1]}'
-            hours = int(fields[1])
-            subjects[subject_group] = hours
-    return subjects
+class Subject:
+    def __init__(self, subject, hours, group):
+        self.subject = subject
+        self.group = group
+        self.hours = int(hours)
+
+    def has_pattern(self, pattern):
+        return pattern in self.subject or pattern in self.group
+
+    def __str__(self):
+        return f'{self.subject}-{self.group}({self.hours})'
 
 
-def combination_has_subjects(combination: tuple, subjects: tuple[str]):
-    matches = 0
-    for subject in subjects:
-        for item in combination:
-            if subject in item:
-                matches += 1
-                break
-    return matches == len(subjects)
+class Schedule:
+    def __init__(self, subjects: tuple[Subject]):
+        self.subjects = sorted(subjects, key=operator.attrgetter('group'))
+
+    @property
+    def hours(self):
+        return sum(s.hours for s in self.subjects)
+
+    def has_patterns(self, patterns: tuple[str]):
+        matches = 0
+        for pattern in patterns:
+            for subject in self.subjects:
+                if subject.has_pattern(pattern):
+                    matches += 1
+                    break
+        return matches == len(patterns)
+
+    def lack_patterns(self, patterns: tuple[str]):
+        for pattern in patterns:
+            for subject in self.subjects:
+                if not subject.has_pattern(pattern):
+                    return False
+        return True
+
+    def __str__(self):
+        items = ', '.join(str(s) for s in self.subjects)
+        return f'{items} -> {self.hours}h'
 
 
-def combination_hasnot_subjects(combination: tuple, subjects: tuple[str]):
-    for subject in subjects:
-        for item in combination:
-            if subject in item:
-                return False
-    return True
+class SubDraw:
+    def __init__(self, filename):
+        self.subjects = self.load_subjects(filename)
 
+    def load_subjects(self, filename):
+        subjects = []
+        with open(filename) as f:
+            for line in f:
+                fields = line.strip().split(',')
+                subject = Subject(*fields)
+                subjects.append(subject)
+        return subjects
 
-def get_combinations(
-    subjects: dict, hours, max_size, include: tuple[str], exclude: tuple[str]
-):
-    max_size = max_size if max_size > 0 else len(subjects)
-    for size in range(max_size):
-        for combination in itertools.combinations(subjects, size + 1):
-            if ((not include) or combination_has_subjects(combination, include)) and (
-                (not exclude) or combination_hasnot_subjects(combination, exclude)
-            ):
-                combination_hours = sum(subjects[s] for s in combination)
-                if combination_hours == hours:
-                    yield combination, hours
+    def get_schedules(self, hours, max_size, include: tuple[str], exclude: tuple[str]):
+        max_size = max_size if max_size > 0 else len(self.subjects)
+        for size in range(max_size):
+            for subjects in itertools.combinations(self.subjects, size + 1):
+                schedule = Schedule(subjects)
+                if ((not include) or schedule.has_patterns(include)) and (
+                    (not exclude) or schedule.lack_patterns(exclude)
+                ):
+                    if schedule.hours == hours:
+                        yield schedule
 
-
-def show_combination(combination: tuple[tuple[str], int]):
-    subjects = ', '.join(combination[0])
-    hours = combination[1]
-    print(f'{subjects} -> {hours}')
+    def __str__(self):
+        return '\n'.join(str(s) for s in self.subjects)

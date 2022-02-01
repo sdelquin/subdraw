@@ -1,7 +1,7 @@
 import typer
 
 import settings
-from subdraw import core
+from subdraw.core import SubDraw
 
 app = typer.Typer(add_completion=False)
 
@@ -33,9 +33,9 @@ def run(
         None, '--exclude', '-x', help='Exclude this subject, group or subject-group'
     ),
 ):
-    subjects = core.get_subjects(filename)
-    for combination in core.get_combinations(subjects, hours, max_size, include, exclude):
-        core.show_combination(combination)
+    subdraw = SubDraw(filename)
+    for schedule in subdraw.get_schedules(hours, max_size, include, exclude):
+        print(schedule)
 
 
 if __name__ == '__main__':
