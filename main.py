@@ -12,19 +12,19 @@ def run(
         settings.SUBJECTS_FILENAME,
         '--filename',
         '-i',
-        help='Subjects filename',
+        help='Subjects filename (csv format)',
     ),
     hours: int = typer.Option(
         settings.WEEKLY_TEACHING_HOURS,
         '--hours',
         '-h',
-        help='Number of hours to reach with subject combinations',
+        help='Number of hours to reach within each schedule',
     ),
     max_size: int = typer.Option(
         -1,
         '--max-size',
         '-s',
-        help='Maximum size for subject combinations',
+        help='Maximum number of subjects within each schedule. If -1 all sizes are valid.',
     ),
     include: list[str] = typer.Option(
         None, '--include', '-i', help='Include this subject, group or subject-group'
