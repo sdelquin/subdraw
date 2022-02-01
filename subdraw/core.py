@@ -43,6 +43,9 @@ class Schedule:
                     return False
         return True
 
+    def __len__(self):
+        return len(self.subjects)
+
     def __str__(self):
         items = ', '.join(str(s) for s in self.subjects)
         return f'{items} -> {self.hours}h'
@@ -61,7 +64,13 @@ class SubDraw:
                 subjects.append(subject)
         return subjects
 
-    def get_schedules(self, hours, max_size, include: tuple[str], exclude: tuple[str]):
+    def get_schedules(
+        self,
+        hours=settings.WEEKLY_TEACHING_HOURS,
+        max_size=-1,
+        include: tuple[str] = [],
+        exclude: tuple[str] = [],
+    ):
         max_size = max_size if max_size > 0 else len(self.subjects)
         for size in range(max_size):
             for subjects in itertools.combinations(self.subjects, size + 1):
