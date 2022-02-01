@@ -47,8 +47,8 @@ class Schedule:
         return len(self.subjects)
 
     def __str__(self):
-        items = ', '.join(str(s) for s in self.subjects)
-        return f'{items} -> {self.hours}h'
+        items = ' + '.join(str(s) for s in self.subjects)
+        return f'{items} = {self.hours}h'
 
 
 class SubDraw:

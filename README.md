@@ -1,4 +1,4 @@
-# subdraw
+# ✨ subdraw
 
 Elección de materias para horarios de secundaria.
 
@@ -24,11 +24,12 @@ Los datos de entrada estarán en un fichero csv con el siguiente formato:
 
 Por ejemplo:
 
+    FUW,3,1ASR
+    IMW,4,2ASR
     BAE,6,1DAM
-    ETS,3,1DAM
-    LND,4,1DAM
-    PRO,7,1DAM
-    ...
+    PGL,3,2DAM
+    PRO,7,1DAW
+    DSW,5,2DAW
 
 > 💡 &nbsp;No se espera ninguna cabecera.
 
@@ -56,36 +57,55 @@ Obtener todas las combinaciones (_que sumen 18 horas por defecto_):
 
 ```console
 $ python main.py
+
+BAE-1DAM(6) + PRO-1DAW(7) + DSW-2DAW(5) = 18h
+FUW-1ASR(3) + BAE-1DAM(6) + IMW-2ASR(4) + DSW-2DAW(5) = 18h
+FUW-1ASR(3) + PRO-1DAW(7) + PGL-2DAM(3) + DSW-2DAW(5) = 18h
+BAE-1DAM(6) + IMW-2ASR(4) + PGL-2DAM(3) + DSW-2DAW(5) = 18h
 ```
 
-Obtener todas las combinaciones que sumen 19 horas:
+Obtener todas las combinaciones que sumen 20 horas:
 
 ```console
-$ python main.py -h19
+$ python main.py -h20
+
+FUW-1ASR(3) + BAE-1DAM(6) + PRO-1DAW(7) + IMW-2ASR(4) = 20h
+BAE-1DAM(6) + PRO-1DAW(7) + IMW-2ASR(4) + PGL-2DAM(3) = 20h
 ```
 
-Obtener todas las combinaciones que tengan, como máximo, 4 asignaturas:
+Obtener todas las combinaciones que tengan, como máximo, 3 asignaturas:
 
 ```console
-$ python main.py -s4
+$ python main.py -s3
+
+BAE-1DAM(6) + PRO-1DAW(7) + DSW-2DAW(5) = 18h
 ```
 
-Obtener todas las combinaciones que incluyan la asignatura DPL:
+Obtener todas las combinaciones que incluyan la asignatura FUW:
 
 ```console
-$ python main.py -i DPL
+$ python main.py -i FUW
+
+FUW-1ASR(3) + BAE-1DAM(6) + IMW-2ASR(4) + DSW-2DAW(5) = 18h
+FUW-1ASR(3) + PRO-1DAW(7) + PGL-2DAM(3) + DSW-2DAW(5) = 18h
 ```
 
-Obtener todas las combinaciones que incluyan la asignatura DPL de 1ºDAM y además, que incluyan todas las asignaturas del grupo 2ºDAM:
+Obtener todas las combinaciones que incluyan la asignatura BAE de 1ºDAM y además, que incluyan todas las asignaturas del grupo 2ºASR:
 
 ```console
-$ python main.py -i DPL-1DAM -i 2DAM
+$ python main.py -i BAE-1DAM -i 2ASR
+
+FUW-1ASR(3) + BAE-1DAM(6) + IMW-2ASR(4) + DSW-2DAW(5) = 18h
+BAE-1DAM(6) + IMW-2ASR(4) + PGL-2DAM(3) + DSW-2DAW(5) = 18h
 ```
 
-Obtener todas las combinaciones excluyendo la asignatura FCT:
+Obtener todas las combinaciones excluyendo la asignatura PRO:
 
 ```console
-$ python main.py -x FCT
+$ python main.py -x PRO
+
+FUW-1ASR(3) + BAE-1DAM(6) + IMW-2ASR(4) + DSW-2DAW(5) = 18h
+BAE-1DAM(6) + IMW-2ASR(4) + PGL-2DAM(3) + DSW-2DAW(5) = 18h
 ```
 
 Usar otro fichero de entrada:
@@ -97,5 +117,7 @@ $ python main.py -f funny-subjects.csv
 Todos estos parámetros se pueden combinar para conseguir filtros más potentes:
 
 ```console
-$ python main.py -f mydata.csv -s3 -h17 -i PRO -x ETS-1DAM
+$ python main.py -f mydata.csv -s3 -h17 -i PRO -x 2DAM
+
+BAE-1DAM(6) + PRO-1DAW(7) + IMW-2ASR(4) = 17h
 ```
