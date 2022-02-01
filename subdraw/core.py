@@ -1,6 +1,8 @@
 import itertools
 import operator
 
+import settings
+
 
 class Subject:
     def __init__(self, subject, hours, group):
@@ -9,10 +11,12 @@ class Subject:
         self.hours = int(hours)
 
     def has_pattern(self, pattern):
+        if len(m := pattern.split(settings.SUBJECT_DELIMITER)) > 1:
+            return m[0] in self.subject and m[1] in self.group
         return pattern in self.subject or pattern in self.group
 
     def __str__(self):
-        return f'{self.subject}-{self.group}({self.hours})'
+        return f'{self.subject}{settings.SUBJECT_DELIMITER}{self.group}({self.hours})'
 
 
 class Schedule:
@@ -35,7 +39,7 @@ class Schedule:
     def lack_patterns(self, patterns: tuple[str]):
         for pattern in patterns:
             for subject in self.subjects:
-                if not subject.has_pattern(pattern):
+                if subject.has_pattern(pattern):
                     return False
         return True
 
