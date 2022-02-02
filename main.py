@@ -1,7 +1,7 @@
 import typer
 
 import settings
-from subdraw.core import SubDraw
+from subdraw import core
 
 app = typer.Typer(add_completion=False)
 
@@ -32,10 +32,12 @@ def run(
     exclude: list[str] = typer.Option(
         None, '--exclude', '-x', help='Exclude this subject, group or subject-group'
     ),
+    color: bool = True,
 ):
-    subdraw = SubDraw(filename)
-    for schedule in subdraw.get_schedules(hours, max_size, include, exclude):
-        print(schedule)
+    settings.OUTPUT_COLOR = color
+    subdraw = core.SubDraw(filename)
+    subdraw.get_schedules(hours, max_size, include, exclude)
+    subdraw.schedules_as_table()
 
 
 if __name__ == '__main__':

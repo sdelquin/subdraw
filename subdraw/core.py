@@ -1,5 +1,9 @@
+import hashlib
 import itertools
 import operator
+
+from rich.console import Console
+from rich.table import Table
 
 import settings
 
@@ -16,7 +20,16 @@ class Subject:
         return pattern in self.subject or pattern in self.group
 
     def __str__(self):
-        return f'{self.subject}{settings.SUBJECT_DELIMITER}{self.group}({self.hours})'
+        return f'{self.subject}{settings.SUBJECT_DELIMITER}{self.group} ({self.hours})'
+
+    @property
+    def color(self):
+        '''https://rich.readthedocs.io/en/latest/appendix/colors.html#appendix-colors'''
+        if settings.OUTPUT_COLOR:
+            payload = self.subject + self.group
+            hash = int(hashlib.md5(payload.encode('utf-8')).hexdigest(), base=16)
+            return (hash % settings.OUTPUT_MAX_COLOR) + 1
+        return settings.OUTPUT_STD_COLOR
 
 
 class Schedule:
@@ -46,10 +59,6 @@ class Schedule:
     def __len__(self):
         return len(self.subjects)
 
-    def __str__(self):
-        items = ' + '.join(str(s) for s in self.subjects)
-        return f'{items} = {self.hours}h'
-
 
 class SubDraw:
     def __init__(self, filename):
@@ -71,6 +80,8 @@ class SubDraw:
         include: tuple[str] = [],
         exclude: tuple[str] = [],
     ):
+        self.schedules = []
+        self.max_schedule_size = 0
         max_size = max_size if max_size > 0 else len(self.subjects)
         for size in range(max_size):
             for subjects in itertools.combinations(self.subjects, size + 1):
@@ -79,7 +90,16 @@ class SubDraw:
                     (not exclude) or schedule.lack_patterns(exclude)
                 ):
                     if schedule.hours == hours:
-                        yield schedule
+                        self.max_schedule_size = max(self.max_schedule_size, len(schedule))
+                        self.schedules.append(schedule)
+        self.schedules = sorted(self.schedules, key=operator.attrgetter('hours'))
 
-    def __str__(self):
-        return '\n'.join(str(s) for s in self.subjects)
+    def schedules_as_table(self):
+        console = Console()
+        table = Table(show_header=False)
+        for schedule in self.schedules:
+            subjects = [f'[color({s.color})]{str(s)}[/]' for s in schedule.subjects]
+            gaps = ['' for _ in range(len(schedule), self.max_schedule_size)]
+            hours = f'[dim]{schedule.hours}[/]'
+            table.add_row(*subjects, *gaps, hours)
+        console.print(table)

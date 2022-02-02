@@ -45,16 +45,21 @@ def test_schedule_has_right_hours(schedule):
 
 
 def test_schedules_have_given_hours(subdraw):
-    schedules = list(subdraw.get_schedules(hours=10))
-    assert all(s.hours == 10 for s in schedules)
-    assert len(schedules) == 42
+    subdraw.get_schedules(hours=10)
+    assert all(s.hours == 10 for s in subdraw.schedules)
+    assert len(subdraw.schedules) == 42
 
 
 def test_schedules_have_default_hours(subdraw):
-    schedules = list(subdraw.get_schedules())
-    assert all(s.hours == settings.WEEKLY_TEACHING_HOURS for s in schedules)
+    subdraw.get_schedules()
+    assert all(s.hours == settings.WEEKLY_TEACHING_HOURS for s in subdraw.schedules)
 
 
 def test_schedules_have_given_size(subdraw):
-    schedules = list(subdraw.get_schedules(hours=12, max_size=4))
-    assert all(len(s) <= 4 for s in schedules)
+    subdraw.get_schedules(hours=12, max_size=4)
+    assert all(len(s) <= 4 for s in subdraw.schedules)
+
+
+def test_max_schedule_size(subdraw):
+    subdraw.get_schedules(max_size=3)
+    assert subdraw.max_schedule_size <= 3
