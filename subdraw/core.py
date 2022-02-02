@@ -24,11 +24,11 @@ class Subject:
 
     @property
     def color(self):
-        '''https://rich.readthedocs.io/en/latest/appendix/colors.html#appendix-colors'''
         if settings.OUTPUT_COLOR:
             payload = self.subject + self.group
             hash = int(hashlib.md5(payload.encode('utf-8')).hexdigest(), base=16)
-            return (hash % settings.OUTPUT_MAX_COLOR) + 1
+            color_index = hash % len(settings.SUBJECT_COLORS)
+            return settings.SUBJECT_COLORS[color_index]
         return settings.OUTPUT_STD_COLOR
 
 
@@ -39,6 +39,13 @@ class Schedule:
     @property
     def hours(self):
         return sum(s.hours for s in self.subjects)
+
+    @property
+    def hours_color(self):
+        if settings.OUTPUT_COLOR:
+            color_index = self.hours % len(settings.HOURS_COLORS)
+            return settings.HOURS_COLORS[color_index]
+        return settings.REGULAR_COLOR
 
     def has_patterns(self, patterns: tuple[str]):
         matches = 0
@@ -76,6 +83,7 @@ class SubDraw:
     def get_schedules(
         self,
         hours=settings.WEEKLY_TEACHING_HOURS,
+        hours_range=0,
         max_size=-1,
         include: tuple[str] = [],
         exclude: tuple[str] = [],
@@ -89,7 +97,7 @@ class SubDraw:
                 if ((not include) or schedule.has_patterns(include)) and (
                     (not exclude) or schedule.lack_patterns(exclude)
                 ):
-                    if schedule.hours == hours:
+                    if (hours - hours_range) <= schedule.hours <= (hours + hours_range):
                         self.max_schedule_size = max(self.max_schedule_size, len(schedule))
                         self.schedules.append(schedule)
         self.schedules = sorted(self.schedules, key=operator.attrgetter('hours'))
@@ -100,6 +108,6 @@ class SubDraw:
         for schedule in self.schedules:
             subjects = [f'[color({s.color})]{str(s)}[/]' for s in schedule.subjects]
             gaps = ['' for _ in range(len(schedule), self.max_schedule_size)]
-            hours = f'[dim]{schedule.hours}[/]'
+            hours = f'[color({schedule.hours_color})]{schedule.hours}[/]'
             table.add_row(*subjects, *gaps, hours)
         console.print(table)

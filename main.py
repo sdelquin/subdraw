@@ -20,6 +20,12 @@ def run(
         '-h',
         help='Number of hours to reach within each schedule',
     ),
+    hours_range: int = typer.Option(
+        0,
+        '--hours-range',
+        '-r',
+        help='Schedules will be in [hours - hours-range, hours + hours-range]',
+    ),
     max_size: int = typer.Option(
         -1,
         '--max-size',
@@ -36,7 +42,7 @@ def run(
 ):
     settings.OUTPUT_COLOR = color
     subdraw = core.SubDraw(filename)
-    subdraw.get_schedules(hours, max_size, include, exclude)
+    subdraw.get_schedules(hours, hours_range, max_size, include, exclude)
     subdraw.schedules_as_table()
 
 
