@@ -32,6 +32,13 @@ def run(
         '-s',
         help='Maximum number of subjects within each schedule. If -1 all sizes are valid.',
     ),
+    max_groups: int = typer.Option(
+        -1,
+        '--max-groups',
+        '-g',
+        help='Maximum number of (different) groups within each schedule. '
+        'If -1 no restriction is applied.',
+    ),
     include: list[str] = typer.Option(
         None, '--include', '-i', help='Include this subject, group or subject-group'
     ),
@@ -42,7 +49,7 @@ def run(
 ):
     settings.OUTPUT_COLOR = color
     subdraw = core.SubDraw(filename)
-    subdraw.get_schedules(hours, hours_range, max_size, include, exclude)
+    subdraw.get_schedules(hours, hours_range, max_size, max_groups, include, exclude)
     subdraw.schedules_as_table()
 
 

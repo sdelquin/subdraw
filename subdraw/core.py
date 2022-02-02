@@ -29,7 +29,7 @@ class Subject:
             hash = int(hashlib.md5(payload.encode('utf-8')).hexdigest(), base=16)
             color_index = hash % len(settings.SUBJECT_COLORS)
             return settings.SUBJECT_COLORS[color_index]
-        return settings.OUTPUT_STD_COLOR
+        return settings.REGULAR_COLOR
 
 
 class Schedule:
@@ -39,6 +39,10 @@ class Schedule:
     @property
     def hours(self):
         return sum(s.hours for s in self.subjects)
+
+    @property
+    def num_groups(self):
+        return len(set(s.group for s in self.subjects))
 
     @property
     def hours_color(self):
@@ -85,6 +89,7 @@ class SubDraw:
         hours=settings.WEEKLY_TEACHING_HOURS,
         hours_range=0,
         max_size=-1,
+        max_groups=-1,
         include: tuple[str] = [],
         exclude: tuple[str] = [],
     ):
@@ -94,20 +99,29 @@ class SubDraw:
         for size in range(max_size):
             for subjects in itertools.combinations(self.subjects, size + 1):
                 schedule = Schedule(subjects)
-                if ((not include) or schedule.has_patterns(include)) and (
-                    (not exclude) or schedule.lack_patterns(exclude)
+                if all(
+                    [
+                        (not include) or schedule.has_patterns(include),
+                        (not exclude) or schedule.lack_patterns(exclude),
+                        (hours - hours_range) <= schedule.hours <= (hours + hours_range),
+                        max_groups < 0 or schedule.num_groups <= max_groups,
+                    ],
                 ):
-                    if (hours - hours_range) <= schedule.hours <= (hours + hours_range):
-                        self.max_schedule_size = max(self.max_schedule_size, len(schedule))
-                        self.schedules.append(schedule)
+                    self.max_schedule_size = max(self.max_schedule_size, len(schedule))
+                    self.schedules.append(schedule)
         self.schedules = sorted(self.schedules, key=operator.attrgetter('hours'))
 
     def schedules_as_table(self):
         console = Console()
-        table = Table(show_header=False)
+        table = Table()
+        for col in range(self.max_schedule_size):
+            table.add_column(f'S{col + 1}')
+        table.add_column('G')
+        table.add_column('H')
         for schedule in self.schedules:
             subjects = [f'[color({s.color})]{str(s)}[/]' for s in schedule.subjects]
             gaps = ['' for _ in range(len(schedule), self.max_schedule_size)]
+            num_groups = str(schedule.num_groups)
             hours = f'[color({schedule.hours_color})]{schedule.hours}[/]'
-            table.add_row(*subjects, *gaps, hours)
+            table.add_row(*subjects, *gaps, num_groups, hours)
         console.print(table)
