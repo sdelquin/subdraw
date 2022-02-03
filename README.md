@@ -357,3 +357,12 @@ Todos estos argumentos se pueden combinar para conseguir filtros más potentes:
 ```console
 $ python main.py -i PRO -s4 --gmax 3 --smin 5
 ```
+
+## Tests
+
+Existen [tests](tests) para comprobar el correcto funcionamiento de la herramienta:
+
+```console
+$ pip install pytest
+$ pytest
+```
