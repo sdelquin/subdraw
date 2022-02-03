@@ -45,6 +45,7 @@ class Schedule:
         self.subjects = sorted(subjects, key=operator.attrgetter('group'))
         self.hours = sum(s.hours for s in self.subjects)
         self.num_groups = len(set(s.group for s in self.subjects))
+        self.num_subjects = len(set(s.subject for s in self.subjects))
         self.smin_hours = min(s.hours for s in self.subjects)
         self.smax_hours = max(s.hours for s in self.subjects)
         self.hours_color = self.get_hours_color()
@@ -83,6 +84,7 @@ class Schedule:
         smax_hours,
         include,
         exclude,
+        distinct_subjects,
     ):
         return all(
             [
@@ -93,6 +95,7 @@ class Schedule:
                 max_groups < 0 or self.num_groups <= max_groups,
                 self.smin_hours >= smin_hours,
                 self.smax_hours <= smax_hours,
+                not distinct_subjects or self.num_subjects == len(self),
             ]
         )
 
@@ -121,6 +124,7 @@ class SubDraw:
         smax_hours=settings.MAX_HOURS_PER_WEEK,
         include: tuple[str] = [],
         exclude: tuple[str] = [],
+        distinct_subjects=False,
     ):
         self.schedules = []
         self.max_schedule_size = 0
@@ -137,6 +141,7 @@ class SubDraw:
                     smax_hours,
                     include,
                     exclude,
+                    distinct_subjects,
                 ):
                     self.max_schedule_size = max(self.max_schedule_size, len(schedule))
                     self.schedules.append(schedule)

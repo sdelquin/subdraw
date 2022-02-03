@@ -52,12 +52,18 @@ def run(
         help='Maximum number of hours for each subject in schedule. ',
     ),
     include: list[str] = typer.Option(
-        None, '--include', '-i', help='Include this subject, group or subject-group'
+        None, '--include', '-i', help='Include this subject, group or subject-group.'
     ),
     exclude: list[str] = typer.Option(
-        None, '--exclude', '-x', help='Exclude this subject, group or subject-group'
+        None, '--exclude', '-x', help='Exclude this subject, group or subject-group.'
     ),
-    color: bool = True,
+    distinct_subjects: bool = typer.Option(
+        False,
+        '--distinct-subjects',
+        '-d',
+        help='All subjects (without group) must be different.',
+    ),
+    no_color: bool = typer.Option(False, '--no-color', help='Not colorized output.'),
     output_filename: Path = typer.Option(
         None,
         '--output',
@@ -65,10 +71,19 @@ def run(
         help='Output schedules to this filename in csv format.',
     ),
 ):
-    settings.OUTPUT_COLOR = color
+    settings.OUTPUT_COLOR = not no_color
     subdraw = core.SubDraw(filename)
     subdraw.get_schedules(
-        hours, hours_range, max_size, gmin, gmax, smin_hours, smax_hours, include, exclude
+        hours,
+        hours_range,
+        max_size,
+        gmin,
+        gmax,
+        smin_hours,
+        smax_hours,
+        include,
+        exclude,
+        distinct_subjects,
     )
     if output_filename:
         subdraw.schedules_as_csv(output_filename)

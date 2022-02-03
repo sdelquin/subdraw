@@ -63,9 +63,10 @@ Options:
                              schedule.   [default: 1]
   --smax INTEGER             Maximum number of hours for each subject in
                              schedule.   [default: 30]
-  -i, --include TEXT         Include this subject, group or subject-group
-  -x, --exclude TEXT         Exclude this subject, group or subject-group
-  --color / --no-color       [default: color]
+  -i, --include TEXT         Include this subject, group or subject-group.
+  -x, --exclude TEXT         Exclude this subject, group or subject-group.
+  -d, --distinct-subjects    All subjects (without group) must be different.
+  --no-color                 Not colorized output.
   -o, --output PATH          Output schedules to this filename in csv format.
   --help                     Show this message and exit.
 ```
@@ -342,9 +343,13 @@ $ python main.py -x ASR
 2 available schedules!
 ```
 
-### `--color`, `--no-color`
+### `-d`, `--distinct-subjects`
 
-Permite especificar si la salida estará coloreada o no.
+Permite especificar que todas las asignaturas (ignorando el grupo) sean distintas para las combinaciones generadas.
+
+### `--no-color`
+
+Permite especificar que la salida no sea coloreada.
 
 ### `-o`, `--output`
 
