@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import typer
 
 import settings
@@ -8,7 +10,7 @@ app = typer.Typer(add_completion=False)
 
 @app.command()
 def run(
-    filename: str = typer.Option(
+    filename: Path = typer.Option(
         settings.SUBJECTS_FILENAME,
         '--filename',
         '-f',
@@ -46,11 +48,20 @@ def run(
         None, '--exclude', '-x', help='Exclude this subject, group or subject-group'
     ),
     color: bool = True,
+    output_filename: Path = typer.Option(
+        None,
+        '--output',
+        '-o',
+        help='Output schedules to this filename in csv format.',
+    ),
 ):
     settings.OUTPUT_COLOR = color
     subdraw = core.SubDraw(filename)
     subdraw.get_schedules(hours, hours_range, max_size, max_groups, include, exclude)
-    subdraw.schedules_as_table()
+    if output_filename:
+        subdraw.schedules_as_csv(output_filename)
+    else:
+        subdraw.schedules_as_table()
 
 
 if __name__ == '__main__':

@@ -114,14 +114,37 @@ class SubDraw:
     def schedules_as_table(self):
         console = Console()
         table = Table()
+
         for col in range(self.max_schedule_size):
             table.add_column(f'S{col + 1}')
         table.add_column('G')
         table.add_column('H')
+
         for schedule in self.schedules:
             subjects = [f'[color({s.color})]{str(s)}[/]' for s in schedule.subjects]
             gaps = ['' for _ in range(len(schedule), self.max_schedule_size)]
             num_groups = str(schedule.num_groups)
             hours = f'[color({schedule.hours_color})]{schedule.hours}[/]'
             table.add_row(*subjects, *gaps, num_groups, hours)
+
         console.print(table)
+
+    def schedules_as_csv(self, output_filename: str):
+        f = open(output_filename, 'w')
+
+        header = []
+        for col in range(self.max_schedule_size):
+            header.append(f'S{col + 1}')
+        header.append('G')
+        header.append('H')
+        f.write(','.join(header) + '\n')
+
+        for schedule in self.schedules:
+            subjects = [str(s) for s in schedule.subjects]
+            gaps = ['' for _ in range(len(schedule), self.max_schedule_size)]
+            num_groups = str(schedule.num_groups)
+            hours = str(schedule.hours)
+            row = [*subjects, *gaps, num_groups, hours]
+            f.write(','.join(row) + '\n')
+
+        f.close()
