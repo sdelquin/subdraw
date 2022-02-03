@@ -1,11 +1,13 @@
 import hashlib
 import itertools
 import operator
+from functools import lru_cache
 
 from rich.console import Console
 from rich.table import Table
 
 import settings
+from subdraw import utils
 
 
 class Subject:
@@ -13,7 +15,10 @@ class Subject:
         self.subject = subject
         self.group = group
         self.hours = int(hours)
+        self.hash = self.get_hash()
+        self.color = self.get_color()
 
+    @lru_cache
     def has_pattern(self, pattern):
         if len(m := pattern.split(settings.SUBJECT_DELIMITER)) > 1:
             return m[0] in self.subject and m[1] in self.group
@@ -22,35 +27,28 @@ class Subject:
     def __str__(self):
         return f'{self.subject}{settings.SUBJECT_DELIMITER}{self.group} ({self.hours})'
 
-    @property
-    def color(self):
-        if settings.OUTPUT_COLOR:
-            payload = self.subject + self.group
-            hash = int(hashlib.md5(payload.encode('utf-8')).hexdigest(), base=16)
-            color_index = hash % len(settings.SUBJECT_COLORS)
-            return settings.SUBJECT_COLORS[color_index]
-        return settings.REGULAR_COLOR
+    def get_hash(self):
+        return int(
+            hashlib.md5((self.subject + self.group).encode('utf-8')).hexdigest(), base=16
+        )
+
+    def get_color(self):
+        return utils.get_color(self.hash, settings.SUBJECT_COLORS, settings.OUTPUT_COLOR)
 
 
 class Schedule:
     def __init__(self, subjects: tuple[Subject]):
         self.subjects = sorted(subjects, key=operator.attrgetter('group'))
+        self.hours = sum(s.hours for s in self.subjects)
+        self.num_groups = len(set(s.group for s in self.subjects))
+        self.smin_hours = min(s.hours for s in self.subjects)
+        self.smax_hours = max(s.hours for s in self.subjects)
+        self.hours_color = self.get_hours_color()
 
-    @property
-    def hours(self):
-        return sum(s.hours for s in self.subjects)
+    def get_hours_color(self):
+        return utils.get_color(self.hours, settings.HOURS_COLORS, settings.OUTPUT_COLOR)
 
-    @property
-    def num_groups(self):
-        return len(set(s.group for s in self.subjects))
-
-    @property
-    def hours_color(self):
-        if settings.OUTPUT_COLOR:
-            color_index = self.hours % len(settings.HOURS_COLORS)
-            return settings.HOURS_COLORS[color_index]
-        return settings.REGULAR_COLOR
-
+    @lru_cache
     def has_patterns(self, patterns: tuple[str]):
         matches = 0
         for pattern in patterns:
@@ -60,6 +58,7 @@ class Schedule:
                     break
         return matches == len(patterns)
 
+    @lru_cache
     def lack_patterns(self, patterns: tuple[str]):
         for pattern in patterns:
             for subject in self.subjects:
@@ -69,14 +68,6 @@ class Schedule:
 
     def __len__(self):
         return len(self.subjects)
-
-    @property
-    def smin_hours(self):
-        return min(s.hours for s in self.subjects)
-
-    @property
-    def smax_hours(self):
-        return max(s.hours for s in self.subjects)
 
 
 class SubDraw:
