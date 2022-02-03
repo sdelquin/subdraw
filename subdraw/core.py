@@ -73,6 +73,29 @@ class Schedule:
     def __len__(self):
         return len(self.subjects)
 
+    def satisfies(
+        self,
+        hours,
+        hours_range,
+        min_groups,
+        max_groups,
+        smin_hours,
+        smax_hours,
+        include,
+        exclude,
+    ):
+        return all(
+            [
+                (not include) or self.has_patterns(include),
+                (not exclude) or self.lack_patterns(exclude),
+                (hours - hours_range) <= self.hours <= (hours + hours_range),
+                self.num_groups >= min_groups,
+                max_groups < 0 or self.num_groups <= max_groups,
+                self.smin_hours >= smin_hours,
+                self.smax_hours <= smax_hours,
+            ]
+        )
+
 
 class SubDraw:
     def __init__(self, filename):
@@ -105,16 +128,15 @@ class SubDraw:
         for size in range(max_size):
             for subjects in itertools.combinations(self.subjects, size + 1):
                 schedule = Schedule(subjects)
-                if all(
-                    [
-                        (not include) or schedule.has_patterns(include),
-                        (not exclude) or schedule.lack_patterns(exclude),
-                        (hours - hours_range) <= schedule.hours <= (hours + hours_range),
-                        schedule.num_groups >= min_groups,
-                        max_groups < 0 or schedule.num_groups <= max_groups,
-                        schedule.smin_hours >= smin_hours,
-                        schedule.smax_hours <= smax_hours,
-                    ],
+                if schedule.satisfies(
+                    hours,
+                    hours_range,
+                    min_groups,
+                    max_groups,
+                    smin_hours,
+                    smax_hours,
+                    include,
+                    exclude,
                 ):
                     self.max_schedule_size = max(self.max_schedule_size, len(schedule))
                     self.schedules.append(schedule)
