@@ -70,6 +70,14 @@ class Schedule:
     def __len__(self):
         return len(self.subjects)
 
+    @property
+    def smin_hours(self):
+        return min(s.hours for s in self.subjects)
+
+    @property
+    def smax_hours(self):
+        return max(s.hours for s in self.subjects)
+
 
 class SubDraw:
     def __init__(self, filename):
@@ -90,6 +98,8 @@ class SubDraw:
         hours_range=0,
         max_size=-1,
         max_groups=-1,
+        smin_hours=1,
+        smax_hours=settings.MAX_HOURS_PER_WEEK,
         include: tuple[str] = [],
         exclude: tuple[str] = [],
     ):
@@ -105,6 +115,8 @@ class SubDraw:
                         (not exclude) or schedule.lack_patterns(exclude),
                         (hours - hours_range) <= schedule.hours <= (hours + hours_range),
                         max_groups < 0 or schedule.num_groups <= max_groups,
+                        schedule.smin_hours >= smin_hours,
+                        schedule.smax_hours <= smax_hours,
                     ],
                 ):
                     self.max_schedule_size = max(self.max_schedule_size, len(schedule))
@@ -127,7 +139,11 @@ class SubDraw:
             hours = f'[color({schedule.hours_color})]{schedule.hours}[/]'
             table.add_row(*subjects, *gaps, num_groups, hours)
 
-        console.print(table)
+        if self.schedules:
+            console.print(table)
+            print(f'{len(self.schedules)} available schedules!')
+        else:
+            print('No schedules available!')
 
     def schedules_as_csv(self, output_filename: str):
         f = open(output_filename, 'w')

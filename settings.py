@@ -3,6 +3,7 @@ from prettyconf import config
 SUBJECTS_FILENAME = config('SUBJECTS_FILENAME', default='subjects.csv')
 WEEKLY_TEACHING_HOURS = config('WEEKLY_TEACHING_HOURS', default=18, cast=int)
 SUBJECT_DELIMITER = config('SUBJECT_DELIMITER', default='-')
+MAX_HOURS_PER_WEEK = config('MAX_HOURS_PER_WEEK', default=30, cast=int)
 
 # https://rich.readthedocs.io/en/latest/appendix/colors.html#appendix-colors
 OUTPUT_COLOR = config('OUTPUT_COLOR', default=True, cast=int)
