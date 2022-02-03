@@ -70,16 +70,21 @@ def test_schedules_are_in_hours_range(subdraw):
     assert all(16 <= s.hours <= 20 for s in subdraw.schedules)
 
 
+def test_schedules_have_min_groups(subdraw):
+    subdraw.get_schedules(min_groups=3)
+    assert all(s.num_groups >= 4 for s in subdraw.schedules)
+
+
 def test_schedules_have_max_groups(subdraw):
     subdraw.get_schedules(max_groups=3)
     assert all(s.num_groups <= 3 for s in subdraw.schedules)
 
 
-def test_subjects_under_max_shours(subdraw):
-    subdraw.get_schedules(smax_hours=5)
-    assert all(sub.hours <= 5 for sched in subdraw.schedules for sub in sched.subjects)
-
-
 def test_subjects_above_min_shours(subdraw):
     subdraw.get_schedules(smin_hours=3)
     assert all(sub.hours >= 3 for sched in subdraw.schedules for sub in sched.subjects)
+
+
+def test_subjects_under_max_shours(subdraw):
+    subdraw.get_schedules(smax_hours=5)
+    assert all(sub.hours <= 5 for sched in subdraw.schedules for sub in sched.subjects)

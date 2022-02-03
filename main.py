@@ -34,10 +34,12 @@ def run(
         '-s',
         help='Maximum number of subjects within each schedule. If -1 all sizes are valid.',
     ),
-    max_groups: int = typer.Option(
+    gmin: int = typer.Option(
+        1, '--gmin', help='Minimum number of (different) groups within each schedule.'
+    ),
+    gmax: int = typer.Option(
         -1,
-        '--max-groups',
-        '-g',
+        '--gmax',
         help='Maximum number of (different) groups within each schedule. '
         'If -1 no restriction is applied.',
     ),
@@ -66,7 +68,7 @@ def run(
     settings.OUTPUT_COLOR = color
     subdraw = core.SubDraw(filename)
     subdraw.get_schedules(
-        hours, hours_range, max_size, max_groups, smin_hours, smax_hours, include, exclude
+        hours, hours_range, max_size, gmin, gmax, smin_hours, smax_hours, include, exclude
     )
     if output_filename:
         subdraw.schedules_as_csv(output_filename)
