@@ -19,10 +19,14 @@ class Subject:
         self.color = self.get_color()
 
     @lru_cache
-    def has_pattern(self, pattern):
+    def has_pattern(self, pattern: str):
+        pattern = pattern.upper()
+        subject = self.subject.upper()
+        group = self.group.upper()
+
         if len(m := pattern.split(settings.SUBJECT_DELIMITER)) > 1:
-            return m[0] in self.subject and m[1] in self.group
-        return pattern in self.subject or pattern in self.group
+            return m[0] in subject and m[1] in group
+        return pattern in subject or pattern in group
 
     def __str__(self):
         return f'{self.subject}{settings.SUBJECT_DELIMITER}{self.group} ({self.hours})'

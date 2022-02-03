@@ -30,9 +30,13 @@ def test_subjects_are_loaded(subdraw):
 
 def test_subject_has_pattern(subject):
     assert subject.has_pattern('VAO')
+    assert subject.has_pattern('vao')
     assert subject.has_pattern('ESO1A')
+    assert subject.has_pattern('eso1a')
     assert subject.has_pattern('VAO-ESO1A')
+    assert subject.has_pattern('vao-eso1a')
     assert not subject.has_pattern('MAT')
+    assert not subject.has_pattern('mat')
 
 
 def test_schedule_has_patterns(schedule):
